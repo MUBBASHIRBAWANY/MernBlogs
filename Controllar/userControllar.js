@@ -81,3 +81,68 @@ export const userProfile = async (req, res) => {
         res.status(500).send(`Server Error: ${err.message}`);
     }
 };
+
+
+export const getUserById = async (req,res) => {
+    const {id} = req.params
+    try {
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        else{
+            res.status(200).send({status: true, data: user });
+        }
+    }catch(err){
+        console.error(err);
+        res.status(500).send(`Server Error: ${err.message}`);
+    }
+}
+
+export const updateUser = async (req, res) => {
+    const {id} = req.params
+    const {name, email, password, admin} = req.body;
+    try{
+        const user = await User.findByIdAndUpdate(id, {
+            name,
+            email,
+            password: await hashPassword(password),
+            admin : admin? admin : false
+        },{new: true});
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        else{
+            res.status(200).send({status: true, data: user });
+        }
+    }catch(err){
+        console.error(err);
+        res.status(500).send(`Server Error: ${err.message}`);
+    }
+}
+
+export const deleteUser = async (req, res) => {
+    const {id} = req.params
+    try{
+        const user = await User.findByIdAndDelete(id);
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        else{
+            res.status(200).send({status: true, data: user });
+        }
+    }catch(err){
+        console.error(err);
+        res.status(500).send(`Server Error: ${err.message}`);
+    }
+}
+
+export const getUsers = async (req, res) => {
+    try{
+        const users = await User.find();
+        res.status(200).send({status: true, data: users });
+    }catch(err){
+        console.error(err);
+        res.status(500).send(`Server Error: ${err.message}`);
+    }
+}
